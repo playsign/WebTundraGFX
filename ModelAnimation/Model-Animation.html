@@ -16,6 +16,9 @@
 <script src="js/THREEx.FullScreen.js"></script>
 <script src="js/THREEx.WindowResize.js"></script>
 
+<script src="js/BinaryLoader.js"></script>
+<script src="js/ColladaLoader.js"></script>
+
 <!-- jQuery code to display an information button and box when clicked. -->
 <script src="js/jquery-1.9.1.js"></script>
 <script src="js/jquery-ui.js"></script>
@@ -120,28 +123,28 @@ function init()
 
     var ambient = 0x050505, diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
 
-    // // normal map shader
-
+    // normal map shader
     var shader = THREE.ShaderLib[ "normalmap" ];
     var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-    uniforms[ "enableAO" ].value = true;
+    uniforms[ "enableAO" ].value = false;
     uniforms[ "enableDiffuse" ].value = true;
     uniforms[ "enableSpecular" ].value = true;
-    uniforms[ "enableReflection" ].value = false;
+    uniforms[ "enableReflection" ].value = true;
     uniforms[ "enableDisplacement" ].value = false;
 
     uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03_NRM.png" );
-    // uniforms[ "tAO" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
+    uniforms[ "tSpecular" ].value = THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03_SPEC.png" );
+    uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03.png" );
 
     // uniforms[ "tDisplacement" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
     // uniforms[ "uDisplacementBias" ].value = - 0.428408;
     // uniforms[ "uDisplacementScale" ].value = 2.436143;
 
-    // uniforms[ "uNormalScale" ].value.y = -1;
+    uniforms[ "uNormalScale" ].value.y = -1;
 
-    uniforms[ "diffuse" ].value = THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03.png" );
-    uniforms[ "specular" ].value = THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03_SPEC.png" );
+    // uniforms[ "diffuse" ].value.setHex( diffuse );
+    uniforms[ "specular" ].value.setHex( specular );
     // uniforms[ "ambient" ].value.setHex( ambient );
 
     // uniforms[ "shininess" ].value = shininess;
@@ -155,6 +158,7 @@ function init()
 
     //
 
+    // normal map shader
     // var shader = THREE.ShaderLib[ "normalmap" ];
     // var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -162,7 +166,7 @@ function init()
     // uniforms[ "enableDiffuse" ].value = false;
     // uniforms[ "enableSpecular" ].value = false;
     // uniforms[ "enableReflection" ].value = true;
-    // uniforms[ "enableDisplacement" ].value = true;
+    // uniforms[ "enableDisplacement" ].value = false;
 
     // uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03.png" );
     // uniforms[ "tAO" ].value = THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03.png" );
@@ -195,16 +199,45 @@ function init()
 	var jsonLoader = new THREE.JSONLoader();
 
 	// With shaders
-	// jsonLoader.load( "models/White_Tail_Deer_all.js", function( geometry ) { addModelToScene(geometry, material1)} );
+	jsonLoader.load( "models/White_Tail_Deer_all.js", function( geometry ) { addModelToScene(geometry, material1)} );
 
 	// Without shaders
-	jsonLoader.load( "models/White_Tail_Deer_all.js", addModelToScene);
+	// jsonLoader.load( "models/White_Tail_Deer_all.js", addModelToScene);
 
 	// addModelToScene function is called back after model has loaded
+
+    // Obj
+
+    // var loader = new THREE.BinaryLoader( true );
+    // document.body.appendChild( loader.statusDomElement );
+
+    // loader.load( "models/binaryDeer.js", function( geometry ) { addModelToScene( geometry, material1 ) } );
+
+    // Collada
+ //    var dae, skin;
+
+ //    var loader = new THREE.ColladaLoader();
+ //    loader.options.convertUpAxis = true;
+ //    loader.load( './models/White_Tail_Deer_all.dae', addColladaToScene );
+ //    //
 	
-	var ambientLight = new THREE.AmbientLight(0x111111);
-	scene.add(ambientLight);
+	// var ambientLight = new THREE.AmbientLight(0x111111);
+	// scene.add(ambientLight);
 	
+}
+
+function addColladaToScene( collada ) 
+{
+    dae = collada.scene;
+    skin = collada.skins[ 0 ];
+
+    dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
+    dae.updateMatrix();
+
+    // init();
+    // animate();
+
+    scene.add( dae );
 }
 
 function addModelToScene( geometry, materials ) 
@@ -219,8 +252,14 @@ function addModelToScene( geometry, materials )
 	// android = new THREE.Mesh( geometry, materials );
 
 	// Without shaders
-	var material = new THREE.MeshFaceMaterial( materials );
-	android = new THREE.Mesh( geometry, material );
+	// var material = new THREE.MeshFaceMaterial( materials );
+	// android = new THREE.Mesh( geometry, material );
+
+    var mats = [];
+    mats.push(materials);
+
+    var material = new THREE.MeshFaceMaterial( mats );
+    android = new THREE.Mesh( geometry, material );
 
 	android.scale.set(10,10,10);
 	scene.add( android );
