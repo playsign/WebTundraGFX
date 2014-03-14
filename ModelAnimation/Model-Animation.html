@@ -127,7 +127,7 @@ function init()
     var shader = THREE.ShaderLib[ "normalmap" ];
     var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-    uniforms[ "enableAO" ].value = false;
+    // uniforms[ "enableAO" ].value = false;
     uniforms[ "enableDiffuse" ].value = true;
     uniforms[ "enableSpecular" ].value = true;
     uniforms[ "enableReflection" ].value = true;
@@ -226,40 +226,42 @@ function init()
 	
 }
 
-function addColladaToScene( collada ) 
-{
-    dae = collada.scene;
-    skin = collada.skins[ 0 ];
+// function addColladaToScene( collada ) 
+// {
+//     dae = collada.scene;
+//     skin = collada.skins[ 0 ];
 
-    dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
-    dae.updateMatrix();
+//     dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
+//     dae.updateMatrix();
 
-    // init();
-    // animate();
+//     // init();
+//     // animate();
 
-    scene.add( dae );
-}
+//     scene.add( dae );
+// }
 
-function addModelToScene( geometry, materials ) 
+function addModelToScene( geometry, mats ) 
 {
 	geometry.computeTangents();
-
-	// for preparing animation
-	for (var i = 0; i < materials.length; i++)
-		materials[i].morphTargets = true;
-		
-	// With shaders
-	// android = new THREE.Mesh( geometry, materials );
 
 	// Without shaders
 	// var material = new THREE.MeshFaceMaterial( materials );
 	// android = new THREE.Mesh( geometry, material );
 
-    var mats = [];
-    mats.push(materials);
+    // With shaders
+    // var materials = [];
+    // materials.push(mats);
+    // var material = new THREE.MeshFaceMaterial( materials );
+    // android = new THREE.Mesh( geometry, material );
+    // // for preparing animation
+    // for (var i = 0; i < materials.length; i++)
+    //     materials[i].morphTargets = true;
 
-    var material = new THREE.MeshFaceMaterial( mats );
-    android = new THREE.Mesh( geometry, material );
+    // With shaaders and without meshFaceMaterial
+    android = new THREE.Mesh( geometry, mats );
+    // for preparing animation
+    for (var i = 0; i < mats.length; i++)
+        mats[i].morphTargets = true;
 
 	android.scale.set(10,10,10);
 	scene.add( android );
