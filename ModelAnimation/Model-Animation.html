@@ -191,7 +191,7 @@ function init()
     // uniforms[ "ambient" ].value.convertGammaToLinear();
 
 
-    var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
+    var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false, morphTargets: true };
     var material1 = new THREE.ShaderMaterial( parameters );
 
     //
@@ -199,10 +199,10 @@ function init()
 	var jsonLoader = new THREE.JSONLoader();
 
 	// With shaders
-	jsonLoader.load( "models/White_Tail_Deer_all.js", function( geometry ) { addModelToScene(geometry, material1)} );
+	// jsonLoader.load( "models/White_Tail_Deer_all.js", function( geometry ) { addModelToScene(geometry, material1)} );
 
 	// Without shaders
-	// jsonLoader.load( "models/White_Tail_Deer_all.js", addModelToScene);
+	jsonLoader.load( "models/White_Tail_Deer_all.js", addModelToScene);
 
 	// addModelToScene function is called back after model has loaded
 
@@ -240,32 +240,31 @@ function init()
 //     scene.add( dae );
 // }
 
-function addModelToScene( geometry, mats ) 
+// Without shaders
+function addModelToScene( geometry, materials ) 
 {
-	geometry.computeTangents();
-
-	// Without shaders
-	// var material = new THREE.MeshFaceMaterial( materials );
-	// android = new THREE.Mesh( geometry, material );
-
-    // With shaders
-    // var materials = [];
-    // materials.push(mats);
-    // var material = new THREE.MeshFaceMaterial( materials );
-    // android = new THREE.Mesh( geometry, material );
-    // // for preparing animation
-    // for (var i = 0; i < materials.length; i++)
-    //     materials[i].morphTargets = true;
-
-    // With shaaders and without meshFaceMaterial
-    android = new THREE.Mesh( geometry, mats );
     // for preparing animation
-    for (var i = 0; i < mats.length; i++)
-        mats[i].morphTargets = true;
-
-	android.scale.set(10,10,10);
-	scene.add( android );
+    for (var i = 0; i < materials.length; i++)
+        materials[i].morphTargets = true;
+        
+    var material = new THREE.MeshFaceMaterial( materials );
+    android = new THREE.Mesh( geometry, material );
+    android.scale.set(10,10,10);
+    scene.add( android );
 }
+
+// // With shaaders and without meshFaceMaterial
+// function addModelToScene( geometry, mats ) 
+// {
+// 	geometry.computeTangents();
+
+//     // for preparing animation
+//     mats.morphTargets = true;
+//     android = new THREE.Mesh( geometry, mats );
+   
+// 	android.scale.set(10,10,10);
+// 	scene.add( android );
+// }
 
 
 function animate() 
