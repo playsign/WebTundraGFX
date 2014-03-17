@@ -4,7 +4,7 @@
 	<title>Imported Model with Animation (Three.js)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link rel=stylesheet href="css/base.css"/>
+	<link rel="" =stylesheet href="css/base.css"/>
 </head>
 <body>
 
@@ -49,6 +49,8 @@ var clock = new THREE.Clock();
 
 // custom global variables
 var android;
+// debug
+var debugParams;
 
 // the following code is from
 //    http://catchvar.com/threejs-animating-blender-models
@@ -83,6 +85,7 @@ function init()
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	container = document.getElementById( 'ThreeJS' );
 	container.appendChild( renderer.domElement );
+    renderer.setClearColorHex( 0xccccff, 1 );
 	// EVENTS
 	THREEx.WindowResize(renderer, camera);
 	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
@@ -99,21 +102,21 @@ function init()
 	light.position.set(-100,200,100);
 	scene.add(light);
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-	floorTexture.repeat.set( 10, 10 );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -0.5;
-	floor.rotation.x = Math.PI / 2;
-	scene.add(floor);
+	// var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+	// floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+	// floorTexture.repeat.set( 10, 10 );
+	// var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	// var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	// var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	// floor.position.y = -0.5;
+	// floor.rotation.x = Math.PI / 2;
+	// scene.add(floor);
 	// SKYBOX/FOG
-	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
-	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
-	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+	// var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+	// var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x050505, side: THREE.BackSide } );
+	// var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 	// scene.add(skyBox);
-	scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
+	scene.fog = new THREE.FogExp2( 0x050505, 0.00025 );
 	
 	////////////
 	// CUSTOM //
@@ -192,17 +195,17 @@ function init()
 
 
     var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false, morphTargets: true };
-    var material1 = new THREE.ShaderMaterial( parameters );
+    debugParams = parameters;
 
     //
 	
 	var jsonLoader = new THREE.JSONLoader();
 
 	// With shaders
-	// jsonLoader.load( "models/White_Tail_Deer_all.js", function( geometry ) { addModelToScene(geometry, material1)} );
+	jsonLoader.load( "models/White_Tail_Deer_all.js", function( geometry, origmaterials ) { addModelToScene(geometry, parameters, origmaterials)} );
 
 	// Without shaders
-	jsonLoader.load( "models/White_Tail_Deer_all.js", addModelToScene);
+	// jsonLoader.load( "models/White_Tail_Deer_all.js", addModelToScene);
 
 	// addModelToScene function is called back after model has loaded
 
@@ -240,32 +243,40 @@ function init()
 //     scene.add( dae );
 // }
 
-// Without shaders
-function addModelToScene( geometry, materials ) 
-{
-    // for preparing animation
-    for (var i = 0; i < materials.length; i++)
-        materials[i].morphTargets = true;
-        
-    var material = new THREE.MeshFaceMaterial( materials );
-    android = new THREE.Mesh( geometry, material );
-    android.scale.set(10,10,10);
-    scene.add( android );
-}
-
-// // With shaaders and without meshFaceMaterial
-// function addModelToScene( geometry, mats ) 
+// // Without shaders
+// function addModelToScene( geometry, materials ) 
 // {
-// 	geometry.computeTangents();
-
 //     // for preparing animation
-//     mats.morphTargets = true;
-//     android = new THREE.Mesh( geometry, mats );
-   
-// 	android.scale.set(10,10,10);
-// 	scene.add( android );
+//     for (var i = 0; i < materials.length; i++)
+//         materials[i].morphTargets = true;
+        
+//     var material = new THREE.MeshFaceMaterial( materials );
+//     android = new THREE.Mesh( geometry, material );
+//     android.scale.set(10,10,10);
+//     scene.add( android );
 // }
 
+// With shaaders and without meshFaceMaterial
+function addModelToScene( geometry, shaderparams, origmaterials ) 
+{
+	geometry.computeTangents();
+
+    // TODO
+    // shaderparams.uniforms = THREE.UniformsUtils.merge( [ shaderparams.uniforms, origmaterials.uniforms ] )
+
+    // var material1 = new THREE.ShaderMaterial( shaderparams );
+    // material1.morphTargets = true;
+    var phongMaterial = new THREE.MeshPhongMaterial( { ambient: 0x050505, specular: 0xffffff, shininess: 10, shading: THREE.SmoothShading, map: THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03.png" ), normalMap: THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03_NRM.png" ), specularMap: THREE.ImageUtils.loadTexture( "models/MAP_deer_G-03_SPEC.png" ) } );
+    phongMaterial.morphTargets = true;
+
+    // for preparing animation
+    origmaterials[0].morphTargets = true;
+
+    android = new THREE.Mesh( geometry, phongMaterial );
+   
+	android.scale.set(10,10,10);
+	scene.add( android );
+}
 
 function animate() 
 {
@@ -286,8 +297,28 @@ function update()
 
 function render() 
 {
-	if ( android ) // exists / is loaded 
+	if ( android /* && scene.__webglObjects.length === 2 */) // exists / is loaded 
 	{
+        // if(debugParams && android.__webglMorphTargetInfluences[0] !== 0){
+        // // debugParams.uniforms = THREE.UniformsUtils.merge( [ debugParams.uniforms, scene.__webglObjects[1].opaque.uniforms ] )
+        // debugParams.uniforms.morphTargetInfluences = scene.__webglObjects[1].opaque.uniforms.morphTargetInfluences;
+
+        // var geometry = android.geometry;
+        // var material1 = new THREE.ShaderMaterial( debugParams );
+
+        // // for preparing animation
+        // material1.morphTargets = true;
+        // scene.remove( android );
+        // android = new THREE.Mesh( geometry, material1 );
+       
+        // android.scale.set(10,10,10);
+        // scene.add( android );
+        // debugParams = undefined;
+        // }
+
+        //
+
+
 		// Alternate morph targets
 		time = new Date().getTime() % duration;
 		keyframe = Math.floor( time / interpolation ) + animOffset;
