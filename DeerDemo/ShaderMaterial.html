@@ -94,8 +94,13 @@ function init()
 	container.appendChild( stats.domElement );
 	// LIGHT
 	var light = new THREE.PointLight(0xffffff);
-	light.position.set(-100,200,100);
+	light.position.set(100,-100,-100);
 	scene.add(light);
+	movingLight = new THREE.PointLight(0xF9FCD7);
+	movingLight.position.set(-200,200,200);
+	scene.add(movingLight);
+	// var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+	// scene.add( ambientLight );
 	// FLOOR
 	// var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
 	// floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
@@ -144,10 +149,6 @@ function init()
 
 	// addModelToScene function is called back after model has loaded
 	jsonLoader.load( "models/White_Tail_Deer_all.js", function( geometry, origmaterials ) { addModelToScene(geometry, origmaterials, shaderMaterial)} );
-
-	// var ambientLight = new THREE.AmbientLight(0x111111);
-	// scene.add(ambientLight);
-	
 }
 
 function addModelToScene( geometry, materials, shaderMaterial ) 
@@ -173,6 +174,12 @@ function update()
 	{ 
 		// do something
 	}
+
+	// Translate moving light
+	var time = clock.getElapsedTime();
+	movingLight.position.x = Math.sin(time) * 1000;
+	movingLight.position.z = Math.cos(time) * 1000;
+
 	controls.update();
 	stats.update();
 }
