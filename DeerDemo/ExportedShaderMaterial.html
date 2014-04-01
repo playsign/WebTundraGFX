@@ -122,9 +122,27 @@ function init()
 function addModelToScene( geometry, materials ) 
 {
 	var material = new THREE.MeshFaceMaterial( materials );
-	model = new THREE.Mesh( geometry, material );
-	model.scale.set(10,10,10);
-	scene.add( model );
+
+	deer = new THREE.SkinnedMesh(geometry,
+		material);
+	deer.scale.set(10,10,10);
+    enableSkinning(deer);
+
+	scene.add( deer );
+
+	// ANIMATION
+
+	THREE.AnimationHandler.add( geometry.animations[0] );
+	var animation = new THREE.Animation( deer, "Run-1-15" );
+	animation.play();
+}
+
+function enableSkinning(skinnedMesh) {
+	var materials = skinnedMesh.material.materials;
+	for (var i = 0, length = materials.length; i < length; i++) {
+		var mat = materials[i];
+		mat.skinning = true;
+	}
 }
 
 function animate() 
@@ -142,10 +160,12 @@ function update()
 	}
 
 	// Translate moving light
-	var time = clock.getElapsedTime();
-	movingLight.position.x = Math.sin(time) * 1000;
-	movingLight.position.z = Math.cos(time) * 1000;
+	var delta = clock.getDelta();
+	var elapsd = clock.getElapsedTime();
+	movingLight.position.x = Math.sin(elapsd) * 1000;
+	movingLight.position.z = Math.cos(elapsd) * 1000;
 
+	THREE.AnimationHandler.update( delta );
 	controls.update();
 	stats.update();
 }
